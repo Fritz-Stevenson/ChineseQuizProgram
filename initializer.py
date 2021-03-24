@@ -14,7 +14,7 @@ select_quiz_size = input('''What is the number of questions you would like to an
 Input free run to climb the HSK rankings.'''
                          )
 #vi = qf.QuizList(vocab_input, sign_in_input, int(select_quiz_size))
-vi = qf.QuizList(''.join(hr.hsk1_vocab), fre, int(select_quiz_size))
+vi = qf.QuizList(''.join(hr.hsk1_vocab), 'fre', 5)
 
 
 '''Bug Log
