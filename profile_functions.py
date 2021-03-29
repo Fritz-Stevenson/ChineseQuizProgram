@@ -1,6 +1,7 @@
-import os
+import os, csv
 import dictionary_repository as dr
 from datetime import datetime
+from pathlib import Path
 
 
 class ProfileManipulator:
@@ -9,6 +10,8 @@ class ProfileManipulator:
         if self.check_if_profile_exists() == False:
             self.make_profile_folder()
             self.create_profile()
+        else:
+            self.fetch_csv_to_dict()
 
     def check_if_profile_exists(self):
         return bool(os.path.exists(f'player_profiles\\{self.profile_name}'))
@@ -48,4 +51,42 @@ class ProfileManipulator:
         pass
 
 
+    def fetch_csv_to_dict(self):
+        old_dir = os.getcwd()
+        os.chdir(f'player_profiles\\{self.profile_name}')
+        with open(f'{self.profile_name}_Character_Data.csv', 'r+', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            new_dict = [dict(x) for x in reader]
+            dr.character_dictionary = new_dict
+        with open(f'{self.profile_name}_HSK_Data.csv', 'r+', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            new_dict = [dict(x) for x in reader]
+            dr.HSK_dictionary = new_dict[0]
+        with open(f'{self.profile_name}_Profile_Data.csv', 'r+', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            new_dict = [dict(x) for x in reader]
+            dr.profile_dictionary = new_dict[0]
+
+        os.chdir(old_dir)
+
+
+    def save_dictionaries(self):
+        old_dir = os.getcwd()
+        os.chdir(f'player_profiles\\{self.profile_name}')
+
+        with (open(f'{self.profile_name}_Profile_Data.csv', 'w+', newline='', encoding='utf-8')) as file:
+            writer = csv.DictWriter(file, fieldnames=dr.profile_dictionary.keys())
+            writer.writeheader()
+            writer.writerow(dr.profile_dictionary)
+        with (open(f'{self.profile_name}_HSK_Data.csv', 'w+', newline='', encoding='utf-8')) as file:
+            writer = csv.DictWriter(file, fieldnames=dr.HSK_dictionary.keys())
+            writer.writeheader()
+            writer.writerow(dr.HSK_dictionary)
+        with (open(f'{self.profile_name}_Character_Data.csv', 'w+', newline='', encoding='utf-8')) as file:
+            writer = csv.DictWriter(file, fieldnames=dr.character_dictionary[0].keys())
+            writer.writeheader()
+            for i in dr.character_dictionary:
+                writer.writerow(i)
+        os.chdir(old_dir)
 v = ProfileManipulator('Fritz', 'x')
+v.save_dictionaries()
