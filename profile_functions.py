@@ -2,17 +2,15 @@ import os, csv, random
 import dictionary_repository as dr
 from datetime import datetime
 import hsk_repository as hr
+import quiz_functions as qf
 
 
 class ProfileObject:
     def __init__(self, profile_name):
-        self.list = []
+        self.list = self.instantiate_character_list()
+        self.list_appends = []
         self.profile_name = profile_name
-        if self.check_if_profile_exists() == False:
-            self.make_profile_folder()
-            self.create_profile()
-        else:
-            self.fetch_csv_to_dict()
+        self.create_profile()
         self.HSK_Level = int(dr.profile_dictionary['HSK_Level'])
         self.HSk_points = [dr.HSK_dictionary['HSK1 Points'],
                            dr.HSK_dictionary['HSK2 Points'],
@@ -28,17 +26,29 @@ class ProfileObject:
                                dr.HSK_dictionary['HSK5 Threshold'],
                                dr.HSK_dictionary['HSK6 Threshold']
                                 ]
+        if self.check_if_profile_exists() == False:
+            self.make_profile_folder()
+            self.check_to_add_characters()
+            self.save_files()
+        else:
+            self.fetch_csv_to_dict()
+        self.QuizClass = qf.QuizClass(self.list, self.profile_name)
+        self.QuizClass
 
     def check_to_add_characters(self):
         for x in range(len(self.HSk_points)):
             HSK_level = x+1
-            if self.HSk_points[x] > self.HSK_thresholds[x]:
+            if self.HSk_points[x] >= self.HSK_thresholds[x]:
                 string = f'hsk{HSK_level}_vocab'
                 local_HSK_list = getattr(hr, string)
+                char_to_add = []
                 for i in range(int(len(local_HSK_list) * .08)):
                     char_list_difference = list(set(local_HSK_list) - set(self.list))
                     if len(char_list_difference) != 0:
-                        self.list.append(char_list_difference[random.randint(0, (len(char_list_difference)) - 1)])
+                        char_to_add.append(char_list_difference[random.randint(0, (len(char_list_difference)) - 1)])
+                self.list.append(char_to_add)
+                self.check_if_characters_in_repository(char_to_add)
+                self.HSK_thresholds[x] += 5
 
     def check_if_profile_exists(self):
         return bool(os.path.exists(f'player_profiles\\{self.profile_name}'))
@@ -64,7 +74,7 @@ class ProfileObject:
         HSK_dict['HSK4 Points'] = 0
         HSK_dict['HSK5 Points'] = 0
         HSK_dict['HSK6 Points'] = 0
-        HSK_dict['HSK1 Threshold'] = 5
+        HSK_dict['HSK1 Threshold'] = 0
         HSK_dict['HSK2 Threshold'] = 5
         HSK_dict['HSK3 Threshold'] = 5
         HSK_dict['HSK4 Threshold'] = 5
@@ -90,8 +100,8 @@ class ProfileObject:
         else:
             return 0
 
-    def check_if_characters_in_repository(self):
-        for i in self.list:
+    def check_if_characters_in_repository(self, character_list):
+        for i in character_list:
             if not any(d['Name'] == i for d in dr.character_dictionary):
                 char_dict = {}
                 char_dict['Name'] = i
@@ -101,8 +111,12 @@ class ProfileObject:
                 dr.character_dictionary.append(char_dict)
         # No implementation of this yet
 
-    def create_run_dict(self):
-        pass
+    def instantiate_character_list(self):
+        list = [i['Name'] for i in dr.character_dictionary]
+        #if len(self.list_appends) > 0:
+        #    list.append(self.list_appends)
+        # **self.list_appends is not recognized**
+        return list
 
     def fetch_csv_to_dict(self):
         old_dir = os.getcwd()
@@ -119,7 +133,6 @@ class ProfileObject:
             reader = csv.DictReader(file)
             new_dict = [dict(x) for x in reader]
             dr.profile_dictionary = new_dict[0]
-
         os.chdir(old_dir)
 
     def save_files(self):
@@ -157,5 +170,3 @@ class ProfileObject:
                 dr.HSK_dictionary['HSK5 Points'] += float(i['Accuracy'])/len(hr.hsk5_new)
             elif i['HSK_Level'] == 6:
                 dr.HSK_dictionary['HSK6 Points'] += float(i['Accuracy'])/len(hr.hsk6_new)
-v = ProfileObject('Fritz')
-v.save_files()

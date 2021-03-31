@@ -8,14 +8,15 @@ import profile_functions as pf
 analyzer = ChineseAnalyzer()
 
 
-class QuizList:
-    def __init__(self, li, profile, question_count):
+class QuizClass:
+    def __init__(self, li, profile):
         self.profile = profile
         self.pf_object = pf.ProfileObject(profile)
         self.list = hr.hsk1_vocab #self.decide_hsk()
         self.list_length = len(li)
         self.analyzer =ChineseAnalyzer()
-        for i in range(question_count):
+        self.quit_token = False
+        while self.quit_token == False:
             self.serve_question()
 
     def serve_question(self):
@@ -26,33 +27,35 @@ class QuizList:
         pinyin = zh_object[token[0]][0].pinyin
         approach = self.approach_roll()
         answer_bool = None
-        #if approach == 0:
-            #answer = input(f'What is the meaning of {token}')
-            #if answer in definition:
-            #    print ('True')
-            #    answer_served = True
-            #else:
-            #    print('False')
-            #    answer_served = False
-        #if approach == 1:
-            #answer = input(f'How would you pronounce {token} in pinyin?:  ')
-            #if answer == ''.join(pinyin).lower():
-            #    print('True')
-            #    answer_served = True
-            #else:
-            #    print('False')
-            #    answer_served = False
-        #if approach == 2:
-            #answer = input(f'What character(s) mean ({definition})?:  ')
-            #if answer == token:
-            #    print('True')
-            #    answer_served = True
-            #else:
-            #    print('False')
-            #    answer_served = False
-        #if approach ==3:
-        print(f'Entering a special round! Your character is {token}\n')
-        answer= input('Enter a definition, the correct pinyin and tone, or ') # create another option for the answers
+        if approach == 0:
+            answer = input(f'What is the meaning of {token}')
+            if answer in definition:
+                print ('True')
+                answer_bool = True
+            else:
+                print('False')
+                answer_bool = False
+        if approach == 1:
+            answer = input(f'How would you pronounce {token} in pinyin?:  ')
+            if answer == ''.join(pinyin).lower():
+                print('True')
+                answer_bool = True
+            else:
+                print('False')
+                answer_bool = False
+        if approach == 2:
+            answer = input(f'What character(s) mean ({definition})?:  ')
+            if answer == token:
+                print('True')
+                answer_bool = True
+            else:
+                print('False')
+                answer_bool = False
+        if approach ==3:
+            print(f'Entering a special round! Your character is {token}\n')
+            answer= input('Enter a definition, the correct pinyin and tone, or ') # create another option for the answers
+            answer_bool = True
+        self.check_for_quit(answer)
         self.assign_calculated_adjustments(token, answer_bool)
         self.pf_object.check_to_add_characters()
         print(token, pinyin, definition)
@@ -72,6 +75,8 @@ class QuizList:
             return True
         else:
             pf.ProfileObject.save_files() # pf is a placeholder in this code
+            self.quit_token = True
+
 
     def log_progress(self):
         self.pf_object.save_files()
