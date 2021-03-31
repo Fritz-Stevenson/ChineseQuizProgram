@@ -43,13 +43,13 @@ class ProfileObject:
                 local_HSK_list = getattr(hr, string)
                 char_to_add = []
                 for i in range(int(len(local_HSK_list) * .08)):
-                    char_list_difference = list(set(local_HSK_list) - set(self.list))
+                    char_list_difference = list(set(local_HSK_list) - set(self.list)) # Characters in current HSK level but not in list.
                     if len(char_list_difference) != 0:
                         char_to_add.append(char_list_difference[random.randint(0, (len(char_list_difference)) - 1)])
                 self.list.append(char_to_add)
                 self.check_if_characters_in_repository(char_to_add)
                 self.HSK_thresholds[x] += 5
-
+                print(dr.character_dictionary)
     def check_if_profile_exists(self):
         return bool(os.path.exists(f'player_profiles\\{self.profile_name}'))
 

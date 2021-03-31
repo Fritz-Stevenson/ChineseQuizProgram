@@ -19,7 +19,8 @@ vi
 
 '''Bug Log
 Currently Crunching the loaded initializer instance. ATM working error is 
-line 124, in fetch_csv_to_dict//RecursionError: maximum recursion depth exceeded
+line 86, in assign_calculated_adjustmentscharacter_dict = [i for i in dr.character_dictionary if i['Name'] == character][0]
+    IndexError: list index out of range
 
 
 ProfileObject.list_append is not recognized'''

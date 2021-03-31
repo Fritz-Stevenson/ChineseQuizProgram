@@ -11,7 +11,6 @@ analyzer = ChineseAnalyzer()
 class QuizClass:
     def __init__(self, li, profile):
         self.profile = profile
-        self.pf_object = pf.ProfileObject(profile)
         self.list = hr.hsk1_vocab #self.decide_hsk()
         self.list_length = len(li)
         self.analyzer =ChineseAnalyzer()
@@ -84,7 +83,7 @@ class QuizClass:
     def assign_calculated_adjustments(self, character, value):
         eq = lambda x, y: x + (1 - x) * .25 if y == True else x - (x / 4)
 
-        character_dict = next((i for i in dr.character_dictionary if i['Name'] == character), None)
+        character_dict = [i for i in dr.character_dictionary if i['Name'] == character][0]
         previous_accuracy = character_dict['Accuracy']
         character_dict['Accuracy'] = eq(previous_accuracy, value)
         adjustment_value = character_dict['Accuracy']-previous_accuracy
