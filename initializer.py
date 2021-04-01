@@ -18,10 +18,9 @@ vi
 
 
 '''Bug Log
-Currently Crunching the loaded initializer instance. ATM working error is 
-line 86, in assign_calculated_adjustmentscharacter_dict = [i for i in dr.character_dictionary if i['Name'] == character][0]
-    IndexError: list index out of range
+currently feeding characters that are not in the dictionary
 
+chinese api has unrecognized characters: 对，
 
 ProfileObject.list_append is not recognized'''
 

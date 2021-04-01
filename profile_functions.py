@@ -154,6 +154,10 @@ class ProfileObject:
                 writer.writerow(i)
         os.chdir(old_dir)
 
+    def adjust_HSK_Points(self, char, adjustment):
+        level = self.test_HSK_level(char)
+        dr.HSK_dictionary[f'HSK{level} Points'] += float(adjustment)
+
     def calculate_HSK_points(self):
         (dr.HSK_dictionary['HSK1 Points'],dr.HSK_dictionary['HSK2 Points'],dr.HSK_dictionary['HSK3 Points'],
         dr.HSK_dictionary['HSK4 Points'],dr.HSK_dictionary['HSK5 Points'],dr.HSK_dictionary['HSK6 Points']) =0

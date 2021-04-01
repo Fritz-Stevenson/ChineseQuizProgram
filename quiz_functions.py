@@ -87,12 +87,8 @@ class QuizClass:
         previous_accuracy = character_dict['Accuracy']
         character_dict['Accuracy'] = eq(previous_accuracy, value)
         adjustment_value = character_dict['Accuracy']-previous_accuracy
-        self.adjust_HSK_Points(character, adjustment_value)
+        pf.ProfileObject.adjust_HSK_Points(character, adjustment_value)
 
-
-    def adjust_HSK_Points(self, char, adjustment):
-        level = self.pf_object.test_HSK_level(char)
-        dr.HSK_dictionary[f'HSK{level} Points'] += float(adjustment)
 
 
 
