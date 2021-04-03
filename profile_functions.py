@@ -26,30 +26,31 @@ class ProfileObject:
                                dr.HSK_dictionary['HSK5 Threshold'],
                                dr.HSK_dictionary['HSK6 Threshold']
                                 ]
-        if self.check_if_profile_exists() == False:
+        if not self.check_if_profile_exists():
             self.make_profile_folder()
             self.check_to_add_characters()
             self.save_files()
         else:
             self.fetch_csv_to_dict()
-        self.QuizClass = qf.QuizClass(self.list, self.profile_name)
-        self.QuizClass
+        self.QuizClass = qf.QuizClass()
 
     def check_to_add_characters(self):
         for x in range(len(self.HSk_points)):
-            HSK_level = x+1
+            hsk_level = x+1
             if self.HSk_points[x] >= self.HSK_thresholds[x]:
-                string = f'hsk{HSK_level}_vocab'
-                local_HSK_list = getattr(hr, string)
+                string = f'hsk{hsk_level}_vocab'
+                local_hsk_list = getattr(hr, string)
                 char_to_add = []
-                for i in range(int(len(local_HSK_list) * .08)):
-                    char_list_difference = list(set(local_HSK_list) - set(self.list)) # Characters in current HSK level but not in list.
+                for i in range(int(len(local_hsk_list) * .08)):
+                    char_list_difference = list(set(local_hsk_list) - set(self.list))
+                    # Characters in current HSK level but not in list.
                     if len(char_list_difference) != 0:
                         char_to_add.append(char_list_difference[random.randint(0, (len(char_list_difference)) - 1)])
                 self.list.append(char_to_add)
                 self.check_if_characters_in_repository(char_to_add)
                 self.HSK_thresholds[x] += 5
                 print(dr.character_dictionary)
+
     def check_if_profile_exists(self):
         return bool(os.path.exists(f'player_profiles\\{self.profile_name}'))
 
@@ -60,13 +61,13 @@ class ProfileObject:
         os.chdir(old_directory)
 
     def create_profile(self):
-        profile_dict = {}
+        profile_dict = dict()
         profile_dict['Name'] = self.profile_name
         profile_dict['titles'] = ['Initiate']
         profile_dict['Join Date'] = datetime.strftime(datetime.now(), "%m/%d/%Y")
         profile_dict['Profile age'] = None
         profile_dict['HSK_Level'] = 0
-        HSK_dict = {}
+        HSK_dict = dict()
         HSK_dict['HSK Level'] = 0
         HSK_dict['HSK1 Points'] = 0
         HSK_dict['HSK2 Points'] = 0
@@ -84,7 +85,7 @@ class ProfileObject:
         dr.HSK_dictionary = HSK_dict
         dr.profile_dictionary = profile_dict
 
-    def test_HSK_level(self, char):
+    def test_hsk_level(self, char):
         if char in ''.join(hr.hsk1_vocab) and char not in ''.join(hr.hsk2_vocab):
             return 1
         elif char in ''.join(hr.hsk2_vocab) and char not in ''.join(hr.hsk3_vocab):
@@ -103,20 +104,20 @@ class ProfileObject:
     def check_if_characters_in_repository(self, character_list):
         for i in character_list:
             if not any(d['Name'] == i for d in dr.character_dictionary):
-                char_dict = {}
+                char_dict = dict()
                 char_dict['Name'] = i
                 char_dict['Accuracy'] = 0
-                char_dict['HSK_Level'] = self.test_HSK_level(i)
+                char_dict['HSK_Level'] = self.test_hsk_level(i)
                 char_dict['Weight'] = 0
                 dr.character_dictionary.append(char_dict)
         # No implementation of this yet
 
     def instantiate_character_list(self):
-        list = [i['Name'] for i in dr.character_dictionary]
-        #if len(self.list_appends) > 0:
+        character_list = [i['Name'] for i in dr.character_dictionary]
+        # if len(self.list_appends) > 0:
         #    list.append(self.list_appends)
         # **self.list_appends is not recognized**
-        return list
+        return character_list
 
     def fetch_csv_to_dict(self):
         old_dir = os.getcwd()
@@ -154,13 +155,14 @@ class ProfileObject:
                 writer.writerow(i)
         os.chdir(old_dir)
 
-    def adjust_HSK_Points(self, char, adjustment):
-        level = self.test_HSK_level(char)
+    def adjust_hsk_points(self, char, adjustment):
+        level = self.test_hsk_level(char)
         dr.HSK_dictionary[f'HSK{level} Points'] += float(adjustment)
 
-    def calculate_HSK_points(self):
-        (dr.HSK_dictionary['HSK1 Points'],dr.HSK_dictionary['HSK2 Points'],dr.HSK_dictionary['HSK3 Points'],
-        dr.HSK_dictionary['HSK4 Points'],dr.HSK_dictionary['HSK5 Points'],dr.HSK_dictionary['HSK6 Points']) =0
+    def calculate_hsk_points(self):
+        (dr.HSK_dictionary['HSK1 Points'], dr.HSK_dictionary['HSK2 Points'], dr.HSK_dictionary['HSK3 Points'],
+         dr.HSK_dictionary['HSK4 Points'], dr.HSK_dictionary['HSK5 Points'], dr.HSK_dictionary['HSK6 Points']) \
+            = 0, 0, 0, 0, 0, 0
         for i in dr.character_dictionary:
             if i['HSK_Level'] == 1:
                 dr.HSK_dictionary['HSK1 Points'] += float(i['Accuracy'])/len(hr.hsk1_vocab)
